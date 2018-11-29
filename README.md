@@ -38,3 +38,8 @@ class Model(object):
     labels = ...
     return labels
 ```
+
+
+### 현황*
+
+* UCI-secom 데이터 기준 선형 회귀를 사용할 때 True를 놓치는 확률은 68%, False를 놓치는 확률은 4.8%입니다. 

@@ -34,7 +34,7 @@ def import_dataset():
     try:
         dataset = read_data.main(os.path.join('./data', args.dataset))
         data = dataset[0, 1:, 1:-1].astype(np.float)
-        labels = dataset[0, 1:, -1].astype(np.float)
+        labels = dataset[0, 1:, -1].astype(np.float) 
         return data, labels
     except:
         raise
@@ -43,7 +43,10 @@ def main():
     model = import_model()
     data, labels = import_dataset()
     model.train(data, labels)
-    print(model.test(data))
+    predict = model.test(data)
+    label_ = (predict > 0).astype(np.int32) - (predict < 0).astype(np.int32)
+    print(np.count_nonzero(labels - label_ != 0) / np.count_nonzero(labels > 0))
+    print(np.count_nonzero(labels - label_ != 0) / np.count_nonzero(labels < 0))
     return    
 
 if __name__ == "__main__":
