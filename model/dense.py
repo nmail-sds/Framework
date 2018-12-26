@@ -10,6 +10,7 @@ import numpy as np
 import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Input, Dense
+from sklearn.metrics import confusion_matrix
 
 class Model(object):
 
@@ -48,5 +49,7 @@ class Model(object):
         return : list of predicted output
         '''
         binary_labels = np.asarray(list(map(lambda i: [0, 1] if i else [1, 0], labels)))
-        return self.model.evaluate(data, binary_labels, batch_size = 128)
-
+        labels_pred = self.model.predict(data, batch_size = 128)
+        labels_pred = [0 if l[0] > l[1] else 1 for l in labels_pred]
+        
+        return confusion_matrix(labels, labels_pred)

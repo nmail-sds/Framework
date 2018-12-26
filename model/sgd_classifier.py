@@ -1,18 +1,17 @@
-# Linear Regression
+# sgd classifier
 
 '''
-2018. 11. 22
-선형 회귀 기법을 이용한 데이터 분류 모델
+2018. 12. 27
+SGD-based classifier
 
-* Scikit-learn을 wrap하여 생성
 '''
 
 import numpy as np
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import SGDClassifier
 
 class Model(object):
     def __init__(self, debug=False):
-        self.model = LinearRegression()
+        self.model = SGDClassifier()
         self.debug = debug
         self.reg = None
         return
@@ -27,9 +26,7 @@ class Model(object):
         if self.debug:
             print(data.shape)
             print(labels.shape)
-        self.reg = self.model.fit(data, labels)
-        if self.debug:
-            print(self.reg.score(data, labels))
+        self.model.fit(data, labels)
         return 
 
     def test(self, data, labels):
@@ -38,5 +35,5 @@ class Model(object):
 
         return : list of predicted output
         '''
-        return self.reg.score(data, labels)
+        return self.model.score(data, labels)
 

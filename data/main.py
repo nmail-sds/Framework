@@ -45,20 +45,20 @@ def _read_arff(filename, basedir="."):
 
 def _read_secom():
     # unsplitted data
-    # 1566 -> 500 + 866
+    # 1568 -> 499 + 1068
     working_dir = os.path.join(dir_path, "uci-secom")
     
     uci_secom_data = []
     for filename in os.listdir(working_dir):
         uci_secom_data.extend(_read_csv(filename, working_dir))
     uci_secom_data = np.asarray(uci_secom_data)
-    #print(uci_secom_data.shape)
-
-    # secom data has time column, so we will erase it
-    train_data = uci_secom_data[:500, 1:-1]
-    test_data = uci_secom_data[500:, 1:-1]
-    train_labels = uci_secom_data[:500, -1]
-    test_labels = uci_secom_data[500:, -1]
+    # first line has label name, so it will be removed.
+    # secom data has time column(at first), so we will erase it
+    
+    train_data = uci_secom_data[1:1000, 1:-1]
+    test_data = uci_secom_data[1000:, 1:-1]
+    train_labels = (uci_secom_data[1:1000, -1].astype(int) + 1) / 2
+    test_labels = (uci_secom_data[1000:, -1].astype(int) + 1) / 2
 
     return Data(train_data, train_labels, test_data, test_labels)
 
@@ -101,5 +101,8 @@ def main(dataset: str):
         return None
 
 if __name__ == "__main__":
-    main()
-
+    data = main(input("dataset name(uci-secom, wafer): "))
+    print(data.train.data.shape)
+    print(data.train.labels.shape)
+    print(data.test.data.shape)
+    print(data.test.labels.shape)
