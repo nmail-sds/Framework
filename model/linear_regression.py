@@ -9,6 +9,7 @@
 
 import numpy as np
 from sklearn.linear_model import LinearRegression
+from sklearn.metrics import confusion_matrix 
 
 class Model(object):
     def __init__(self, debug=False):
@@ -38,5 +39,6 @@ class Model(object):
 
         return : list of predicted output
         '''
-        return self.reg.score(data, labels)
+        labels_pred = np.around(self.reg.predict(data)).astype(int)
+        return confusion_matrix(labels, labels_pred, labels=[0, 1])
 

@@ -41,6 +41,8 @@ def _read_arff(filename, basedir="."):
     data, meta = arff.loadarff(filedir)
     return data
 
+
+
 # wrapping function that handles specific dataset
 
 def _read_secom():
@@ -55,8 +57,8 @@ def _read_secom():
     # first line has label name, so it will be removed.
     # secom data has time column(at first), so we will erase it
     
-    train_data = uci_secom_data[1:1000, 1:-1]
-    test_data = uci_secom_data[1000:, 1:-1]
+    train_data = uci_secom_data[1:1000, 1:-1].astype(float)
+    test_data = uci_secom_data[1000:, 1:-1].astype(float)
     train_labels = (uci_secom_data[1:1000, -1].astype(int) + 1) / 2
     test_labels = (uci_secom_data[1000:, -1].astype(int) + 1) / 2
 

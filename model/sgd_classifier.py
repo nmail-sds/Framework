@@ -8,6 +8,7 @@ SGD-based classifier
 
 import numpy as np
 from sklearn.linear_model import SGDClassifier
+from sklearn.metrics import confusion_matrix
 
 class Model(object):
     def __init__(self, debug=False):
@@ -35,5 +36,5 @@ class Model(object):
 
         return : list of predicted output
         '''
-        return self.model.score(data, labels)
-
+        labels_pred = self.model.predict(data)
+        return confusion_matrix(labels, labels_pred) 

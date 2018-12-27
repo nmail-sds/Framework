@@ -11,11 +11,14 @@ Yihan Kim
 import argparse
 import os 
 import importlib
-import numpy as np
+import numpy as np 
+
+from sklearn.model_selection import KFold 
+
 parser = argparse.ArgumentParser(description = "모델, 데이터 및 실행 모드 선택")
 
-parser.add_argument("--model", type=str, help="select mode (e.g. linear_regression)")
-parser.add_argument("--dataset", type=str, help="select dataset (e.g. uci-secom, wafer)")
+parser.add_argument("--model", type=str, required=True, help="select mode (e.g. linear_regression, dense, sgd_classifier)")
+parser.add_argument("--dataset", type=str, required=True, help="select dataset (e.g. uci-secom, wafer)")
 #parser.add_argument("--mode", type=str, help="select mode (train, test or all)")
 
 args = parser.parse_args()
@@ -47,5 +50,27 @@ def main():
     print(predict)
     return    
 
+def main_cv(n_splits: int = 10):
+    '''
+    cross-validation 
+    입력을 n_splits 수로 나누어 validation set을 형성
+    
+    input: n_splits : int (default 10)
+    
+    '''
+    model = import_model()
+    dataset = import_dataset()
+    kf = KFold(n_splits = n_splits)
+
+    for train_idx, val_idx in kf.split(dataset.train.data):
+        train_data, val_data = dataset.train.data[train_idx], dataset.train.data[val_idx]
+        train_labels, val_labels = dataset.train.labels[train_idx], dataset.train.labels[val_idx]
+        model.train(train_data, train_labels, hyperparams = {"validation": (val_data, val_labels)})
+        predict = model.test(dataset.test.data, dataset.test.labels)
+        print("confusion matrix: ")
+        print(predict)
+    return
+
 if __name__ == "__main__":
-    main()
+    #main()
+    main_cv()
