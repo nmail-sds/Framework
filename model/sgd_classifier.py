@@ -17,7 +17,7 @@ class Model(object):
         self.reg = None
         return
 
-    def train(self, data, labels):
+    def train(self, data, labels, hyperparams = None):
         '''
         data : list of input
         labels : list of corresponding output
