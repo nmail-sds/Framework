@@ -5,7 +5,6 @@ Yihan Kim
 
 사용법 : main.py --model [model_name] --data [data_name]
 
-# --mode [train | test | all]
 '''
 
 import argparse
@@ -19,10 +18,9 @@ parser = argparse.ArgumentParser(description = "모델, 데이터 및 실행 모
 
 parser.add_argument("--model", type=str, required=True, help="select mode (e.g. linear_regression, dense, sgd_classifier)")
 parser.add_argument("--dataset", type=str, required=True, help="select dataset (e.g. uci-secom, wafer)")
-#parser.add_argument("--mode", type=str, help="select mode (train, test or all)")
 
 args = parser.parse_args()
-# args.model, args.dataset, args.mode을 통해 입력값을 사용할 수 있음
+# args.model, args.dataset을 통해 입력값을 사용할 수 있음
 
 # args.model을 불러오기
 
@@ -58,16 +56,22 @@ def main_cv(n_splits: int = 10):
     input: n_splits : int (default 10)
     
     '''
-    model = import_model()
     dataset = import_dataset()
     kf = KFold(n_splits = n_splits)
+    
+    result = []
 
     for train_idx, val_idx in kf.split(dataset.train.data):
         train_data, val_data = dataset.train.data[train_idx], dataset.train.data[val_idx]
         train_labels, val_labels = dataset.train.labels[train_idx], dataset.train.labels[val_idx]
+        model = import_model()
         model.train(train_data, train_labels, hyperparams = {"validation": (val_data, val_labels)})
         predict = model.test(dataset.test.data, dataset.test.labels)
-        print("confusion matrix: ")
+        result.append(predict)
+        print(predict)
+
+    print("confusion matrix: ")
+    for predict in result:
         print(predict)
     return
 

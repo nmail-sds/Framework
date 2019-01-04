@@ -11,6 +11,9 @@ import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Input, Dense
 from sklearn.metrics import confusion_matrix
+from keras.optimizers import Adam
+
+from model.loss import weighted_categorical_crossentropy 
 
 class Model(object):
 
@@ -18,14 +21,10 @@ class Model(object):
     
         model = Sequential([
             Dense(32, activation="relu"),
-            Dense(16, activation="relu"),
             Dense(8, activation="relu"),
+            Dense(4, activation="relu"),
             Dense(2, activation="softmax"),
             ])
-        
-        model.compile(optimizer='adam',
-                loss='binary_crossentropy',
-                metrics=['accuracy'])
         
         self.model = model
         return
@@ -40,14 +39,24 @@ class Model(object):
         hyperparams = dictionary maps from name to its value
         return : None 
         '''
+
+        # loss count 
+        one_occurence = np.count_nonzero(labels)
+        zero_occurence = len(labels) - one_occurence
+        self.alpha = zero_occurence / one_occurence
+        
+        self.model.compile(optimizer=Adam(lr=1e-7, decay=1e-7),
+                loss=weighted_categorical_crossentropy(self.alpha),
+                metrics=['accuracy'])
+
         binary_labels = self._int_to_binary(labels)
         if "validation" in hyperparams.keys():
             val_data = hyperparams["validation"][0]
             val_labels = self._int_to_binary(hyperparams["validation"][1])
-            self.model.fit(data, binary_labels, epochs=30, batch_size=32, 
+            self.model.fit(data, binary_labels, epochs=200, batch_size=32, 
                     validation_data = (val_data, val_labels))
         else:
-            self.model.fit(data, binary_labels, epochs=30, batch_size=32)
+            self.model.fit(data, binary_labels, epochs=200, batch_size=32)
         return 
 
     def test(self, data, labels):

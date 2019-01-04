@@ -18,7 +18,7 @@ class Model(object):
         self.reg = None
         return
 
-    def train(self, data, labels):
+    def train(self, data, labels, hyperparams = None):
         '''
         data : list of input
         labels : list of corresponding output
@@ -41,4 +41,4 @@ class Model(object):
         '''
         labels_pred = np.around(self.reg.predict(data)).astype(int)
         return confusion_matrix(labels, labels_pred, labels=[0, 1])
-
+    
