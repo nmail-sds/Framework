@@ -96,8 +96,6 @@ def _read_wafer():
 
     return Data(train_data, train_labels, test_data, test_labels)
 
-
-
 def _read_earthquakes():
     # train_data 322 * 512
     # test_data 139 * 512
@@ -125,6 +123,8 @@ def _read_earthquakes():
 
 
 
+# main function 
+
 def main(dataset: str):
     if dataset == "uci-secom":
         secom_data = _read_secom()
@@ -143,6 +143,7 @@ def main(dataset: str):
         return None
 
 
+# function for unit test
 
 if __name__ == "__main__":
     data = main(input("dataset name(uci-secom, wafer): "))

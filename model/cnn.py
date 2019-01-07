@@ -26,6 +26,9 @@ class Model(object):
         self.debug = debug
         return 
 
+    def _int_to_binary(self, labels):
+        return np.asarray(list(map(lambda i: [0, 1] if i == 1 else [1, 0], labels)))
+
     def train(self, data, labels, hyperparams = dict()):
         '''
         data : list of input
@@ -46,16 +49,27 @@ class Model(object):
         model = Sequential([
             Reshape((512, 1),input_shape = (512,)),
             
-            Conv1D(2, kernel_size=5, activation="relu", padding="valid"),
-            MaxPooling1D(pool_size=4),
+            Conv1D(20, kernel_size=5, activation="relu", padding="valid"),
+            MaxPooling1D(pool_size=2),
             
-            Conv1D(4, kernel_size=7, activation="relu", padding="valid"),
-            MaxPooling1D(pool_size=4),
+            Conv1D(40, kernel_size=5, activation="relu", padding="valid"),
+            MaxPooling1D(pool_size=2),
             
-            Conv1D(8, kernel_size=9, activation="relu", padding="valid"),
+            Conv1D(40, kernel_size=5, activation="relu", padding="valid"),
+            MaxPooling1D(pool_size=2),
+            
+            Conv1D(80, kernel_size=5, activation="relu", padding="valid"),
+            MaxPooling1D(pool_size=2),
+             
+            Conv1D(80, kernel_size=5, activation="relu", padding="valid"),
+            MaxPooling1D(pool_size=2),
+              
+            Conv1D(160, kernel_size=5, activation="relu", padding="valid"),
+            MaxPooling1D(pool_size=2),
+           
             Flatten(),
             
-            Dense(16, activation = "relu"),
+            Dense(32, activation = "relu"),
             Dense(2, activation="softmax"),
             ])
         
@@ -68,7 +82,14 @@ class Model(object):
         self.model = model
         
         binary_labels = np.asarray(list(map(lambda i: [0, 1] if i else [1, 0], labels)))
-        self.model.fit(data, binary_labels, epochs=100, batch_size=32)
+        
+        if "validation" in hyperparams.keys():
+            val_data = hyperparams["validation"][0]
+            val_labels = self._int_to_binary(hyperparams["validation"][1])
+            self.model.fit(data, binary_labels, epochs=20, batch_size=32, 
+                    validation_data = (val_data, val_labels))
+        else:
+            self.model.fit(data, binary_labels, epochs=20, batch_size=32)
         
         return 
 
