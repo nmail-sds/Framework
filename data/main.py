@@ -121,6 +121,87 @@ def _read_earthquakes():
 
     return Data(train_data, train_labels, test_data, test_labels)
 
+def _read_cmu_wafer():
+    
+    normal_dir = os.path.join(dir_path, "cmu-wafer", "normal")
+    abnormal_dir = os.path.join(dir_path, "cmu-wafer", "abnormal")
+
+    def parse_filename(filename: str):
+        return filename.split(".")
+
+    def dtoi(desc: str):
+        return ('6', '7', '8', '11', '12', '15').index(desc)
+    
+    def read_file(filedir):
+        with open(filedir, 'r') as f:
+            r = csv.reader(f, delimiter='\t')
+            try:
+                return [line[1] for line in r]
+            except:
+                print(filedir)
+                return
+    
+    def read_abnormal():
+        data = {}
+        labels = {}
+        for filename in os.listdir(abnormal_dir):
+            filedir = os.path.join(abnormal_dir, filename)
+            run_wafer, desc = parse_filename(filename)
+            if desc not in ('6', '7', '8', '11', '12', '15'):
+                continue
+            if not run_wafer in data.keys():
+                data[run_wafer] = [None] * 6
+            data[run_wafer][dtoi(desc)] = read_file(filedir)
+            labels[run_wafer] = 1
+        return data, labels
+
+    def read_normal():
+        data = {}
+        labels = {}
+        for filename in os.listdir(normal_dir):
+            filedir = os.path.join(normal_dir, filename)
+            run_wafer, desc = parse_filename(filename)
+            if desc not in ('6', '7', '8', '11', '12', '15'):
+                continue
+            if not run_wafer in data.keys():
+                data[run_wafer] = [None] * 6
+            data[run_wafer][dtoi(desc)] = read_file(filedir)
+            labels[run_wafer] = 0
+        return data, labels
+    
+    ab_data, ab_labels = read_abnormal()
+    no_data, no_labels = read_normal()
+
+    # merge normal & abnormal data
+    data_dict = {**ab_data, **no_data}
+    labels_dict = {**ab_labels, **no_labels}
+
+    # integrity check
+    assert data_dict.keys() == labels_dict.keys()
+
+    data = []
+    labels = []
+
+    for key in sorted(data_dict.keys()):
+        # truncate first 100 elements from each series
+        data.append(np.asarray(data_dict[key])[:, :100])
+        labels.append(np.asarray(labels_dict[key]))
+
+    data = np.array(data)
+    labels = np.reshape(labels, -1) 
+    
+    np.random.seed(0)
+    x = np.arange(len(data))
+    np.random.shuffle(x)
+    data = data[x]
+    labels = labels[x]
+    
+    train_data = data[:800]
+    test_data = data[800:]
+    train_labels = labels[:800]
+    test_labels = labels[800:]
+
+    return Data(train_data, train_labels, test_data, test_labels)
 
 
 # main function 
@@ -138,6 +219,10 @@ def main(dataset: str):
         earthquakes_data = _read_earthquakes()
         return earthquakes_data
 
+    if dataset == "cmu-wafer":
+        cmu_wafer_data = _read_cmu_wafer()
+        return cmu_wafer_data
+    
     if dataset == "etc":
         # add something in here
         return None
