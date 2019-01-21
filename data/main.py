@@ -11,23 +11,9 @@ import csv
 import importlib
 import numpy as np
 from scipy.io import arff
-
+from ds import Pair, Data
 # util - absolute directory of current file 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-
-
-
-# Definitions of dataset container 
-
-class Pair(object):
-    def __init__(self, data, labels):
-        self.data = data 
-        self.labels = labels
-
-class Data(object):
-    def __init__(self, train_data, train_labels, test_data, test_labels):
-        self.train = Pair(train_data, train_labels)
-        self.test = Pair(test_data, test_labels)
 
 
 
