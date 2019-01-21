@@ -9,7 +9,7 @@
 import numpy as np
 import tensorflow as tf
 from keras.models import Sequential
-from keras.layers import Input, Dense
+from keras.layers import Input, Dense, Flatten
 from sklearn.metrics import confusion_matrix
 from keras.optimizers import Adam
 
@@ -20,6 +20,7 @@ class Model(object):
     def __init__(self, debug=False):
     
         model = Sequential([
+            Flatten(),
             Dense(32, activation="relu"),
             Dense(8, activation="relu"),
             Dense(4, activation="relu"),
