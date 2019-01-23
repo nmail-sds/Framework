@@ -11,6 +11,7 @@ import csv
 import importlib
 import numpy as np
 from scipy.io import arff
+import data.pickle_loader as pkl_loader
 
 # util - absolute directory of current file 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -231,8 +232,14 @@ def main(dataset: str):
 # for unit test
 
 if __name__ == "__main__":
-    data = main(input("dataset name(uci-secom, wafer): "))
+    data = main(input("dataset name(cmu-wafer): "))
     print(data.train.data.shape)
-    print(data.train.labels.shape)
-    print(data.test.data.shape)
-    print(data.test.labels.shape)
+    pkl_loader.np2pkl("train_data.pkl",data.train.data)
+    pkl_loader.np2pkl("train_labels.pkl", data.train.labels)
+    pkl_loader.np2pkl("test_data.pkl", data.test.data)
+    pkl_loader.np2pkl("test_labels.pkl", data.test.labels)
+    #print(data.train.labels.shape)
+    #print(data.train.labels)
+    #print(data.test.data.shape)
+    #print(data.test.labels.shape)
+    #print(data.test.labels)
