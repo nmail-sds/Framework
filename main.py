@@ -14,6 +14,10 @@ import numpy as np
 
 from sklearn.model_selection import KFold 
 
+import sys
+sys.path.append("./data")
+
+
 parser = argparse.ArgumentParser(description = "모델, 데이터 및 실행 모드 선택")
 
 parser.add_argument("--model", type=str, required=True, help="select mode (e.g. linear_regression, dense, sgd_classifier)")
@@ -22,6 +26,7 @@ parser.add_argument("--smote", action="store_true", default=False, help="resampl
 
 args = parser.parse_args()
 # args.model, args.dataset을 통해 입력값을 사용할 수 있음
+print(args.smote)
 
 # args.model을 불러오기
 

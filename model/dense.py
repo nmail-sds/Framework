@@ -20,7 +20,7 @@ class Model(object):
     def __init__(self, debug=False):
     
         model = Sequential([
-            Flatten(),
+            #Flatten(),
             Dense(32, activation="relu"),
             Dense(8, activation="relu"),
             Dense(4, activation="relu"),
