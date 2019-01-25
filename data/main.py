@@ -122,6 +122,7 @@ def _read_earthquakes():
 
     return Data(train_data, train_labels, test_data, test_labels)
 
+'''
 def _read_cmu_wafer():
     
     normal_dir = os.path.join(dir_path, "cmu-wafer", "normal")
@@ -203,8 +204,18 @@ def _read_cmu_wafer():
     test_labels = labels[800:]
 
     return Data(train_data, train_labels, test_data, test_labels)
+'''
 
+def _read_cmu_wafer():
+    # load faster using pickle 
+    data = Data(None, None, None, None)
+    pkl_loader.np2pkl("train_data.pkl", data.train.data)
+    pkl_loader.np2pkl("train_labels.pkl", data.train.labels)
+    pkl_loader.np2pkl("test_data.pkl", data.test.data)
+    pkl_loader.np2pkl("test_labels.pkl", data.test.labels)
+    return data 
 
+    
 # main function 
 
 def main(dataset: str):
@@ -233,13 +244,11 @@ def main(dataset: str):
 
 if __name__ == "__main__":
     data = main(input("dataset name(cmu-wafer): "))
-    print(data.train.data.shape)
-    pkl_loader.np2pkl("train_data.pkl",data.train.data)
-    pkl_loader.np2pkl("train_labels.pkl", data.train.labels)
-    pkl_loader.np2pkl("test_data.pkl", data.test.data)
-    pkl_loader.np2pkl("test_labels.pkl", data.test.labels)
+    #pkl_loader.np2pkl("train_data.pkl",data.train.data)
+    #pkl_loader.np2pkl("train_labels.pkl", data.train.labels)
+    #pkl_loader.np2pkl("test_data.pkl", data.test.data)
+    #pkl_loader.np2pkl("test_labels.pkl", data.test.labels)
+    #print(data.train.data.shape)
     #print(data.train.labels.shape)
-    #print(data.train.labels)
     #print(data.test.data.shape)
     #print(data.test.labels.shape)
-    #print(data.test.labels)
