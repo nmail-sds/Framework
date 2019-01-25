@@ -13,23 +13,10 @@ import numpy as np
 from scipy.io import arff
 import data.pickle_loader as pkl_loader
 
+from ds import Pair, Data
+from sampling import smote_dataset
 # util - absolute directory of current file 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-
-
-
-# Definitions of dataset container 
-
-class Pair(object):
-    def __init__(self, data, labels):
-        self.data = data 
-        self.labels = labels
-
-class Data(object):
-    def __init__(self, train_data, train_labels, test_data, test_labels):
-        self.train = Pair(train_data, train_labels)
-        self.test = Pair(test_data, test_labels)
-
 
 
 # Primitive function that read data file
@@ -218,37 +205,33 @@ def _read_cmu_wafer():
     
 # main function 
 
-def main(dataset: str):
-    if dataset == "uci-secom":
-        secom_data = _read_secom()
-        return secom_data
+def main(dataset_name: str, smote: bool = False):
+    if dataset_name == "uci-secom":
+        dataset = _read_secom()
 
-    if dataset == "wafer":
-        wafer_data = _read_wafer()
-        return wafer_data
+    if dataset_name == "wafer":
+        dataset = _read_wafer()
     
-    if dataset == "earthquake":
-        earthquakes_data = _read_earthquakes()
-        return earthquakes_data
+    if dataset_name == "earthquake":
+        dataset = _read_earthquakes()
 
-    if dataset == "cmu-wafer":
-        cmu_wafer_data = _read_cmu_wafer()
-        return cmu_wafer_data
+    if dataset_name == "cmu-wafer":
+        dataset = _read_cmu_wafer()
     
-    if dataset == "etc":
+    if dataset_name == "etc":
         # add something in here
         return None
-
-
+    
+    # data manipulation
+    if smote:
+        dataset = smote_dataset(dataset)
+    
+    return dataset
 # for unit test
 
 if __name__ == "__main__":
-    data = main(input("dataset name(cmu-wafer): "))
-    #pkl_loader.np2pkl("train_data.pkl",data.train.data)
-    #pkl_loader.np2pkl("train_labels.pkl", data.train.labels)
-    #pkl_loader.np2pkl("test_data.pkl", data.test.data)
-    #pkl_loader.np2pkl("test_labels.pkl", data.test.labels)
-    #print(data.train.data.shape)
-    #print(data.train.labels.shape)
-    #print(data.test.data.shape)
-    #print(data.test.labels.shape)
+    data = main(input("dataset name(uci-secom, wafer): "), smote = True)
+    print(data.train.data.shape)
+    print(data.train.labels.shape)
+    print(data.test.data.shape)
+    print(data.test.labels.shape)

@@ -17,13 +17,19 @@ import model.lstm as lstm
 from sklearn.model_selection import KFold
 from sklearn.model_selection import train_test_split
 
+import sys
+sys.path.append("./data")
+
+
 parser = argparse.ArgumentParser(description = "모델, 데이터 및 실행 모드 선택")
 
-parser.add_argument("--model", type=str, required=False, default="lstm", help="select mode (e.g. linear_regression, dense, sgd_classifier)")
-parser.add_argument("--dataset", type=str, required=False, default="cmu-wafer", help="select dataset (e.g. uci-secom, wafer)")
+parser.add_argument("--model", type=str, default="lstm", help="select mode (e.g. linear_regression, dense, sgd_classifier)")
+parser.add_argument("--dataset", type=str, default="cmu-wafer", help="select dataset (e.g. uci-secom, wafer)")
+parser.add_argument("--smote", action="store_true", default=False, help="resample minority class using SMOTE")
 
 args = parser.parse_args()
 # args.model, args.dataset을 통해 입력값을 사용할 수 있음
+print(args.smote)
 
 # args.model을 불러오기
 
@@ -38,7 +44,7 @@ def import_model():
 from data import main as read_data
 def import_dataset():
     try:
-        return read_data.main(args.dataset)
+        return read_data.main(args.dataset, args.smote)
     except:
         raise
 

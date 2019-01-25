@@ -1,11 +1,18 @@
-# Framework v0.1
+# Framework v0.3
   
-* 2018년 11월 22일 작성
-* 20183111 김이한(kabi@kaist.ac.kr, yihankim95@gmail.com)
+* 2018년 1월 23일 수정
+* 김이한 (yihankim95@gmail.com)
 
 * 삼성전략협업과제(반도체 생성 공정을 위한 딥러닝 기반 해석 가능한 이상 상태 검출 시스템) 프레임워크를 작성중입니다.
 * 프로젝트를 위한 프레임워크는 설계한 모델을 `model/` 디렉터리에 넣으면 학습, 테스트가 가능하도록 합니다.
 
+### 명령어 설명
+
+`python main.py --dataset [dataset-name] --model [model-name] [--smote]`
+
+* `--dataset` : 데이터셋 선택
+* `--model` : 학습모델 선택
+* `--smote` : 데이터셋 오버샘플링 기법 적용 여부
 
 ### main.py 실행 방법
 
