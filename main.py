@@ -13,6 +13,13 @@ import importlib
 import numpy as np
 import data.pickle_loader as pkl_loader
 import model.lstm as lstm
+import model.cnn_lstm as cnn_lstm
+from imblearn.over_sampling import SMOTE
+from imblearn.combine import SMOTEENN
+from imblearn.combine import SMOTETomek
+from imblearn.over_sampling import ADASYN
+from imblearn.under_sampling import ClusterCentroids
+from data.main import Data
 
 from sklearn.model_selection import KFold
 from sklearn.model_selection import train_test_split
@@ -41,6 +48,71 @@ def import_dataset():
         return read_data.main(args.dataset)
     except:
         raise
+
+def smote_dataset(dataset: Data):
+    # unpack
+    X = dataset.train.data
+    y = dataset.train.labels
+
+    data_shape = np.shape(X)
+
+    X_reshaped = np.reshape(X, (data_shape[0], -1))
+    sm = SMOTE(random_state=42)
+    X_res, Y_res = sm.fit_resample(X_reshaped, y)
+    X_res = np.reshape(X_res, [-1, *data_shape[1:]])
+    return Data(X_res, Y_res, dataset.test.data, dataset.test.labels)
+
+def smoteenn_dataset(dataset: Data):
+    # unpack
+    X = dataset.train.data
+    y = dataset.train.labels
+
+    data_shape = np.shape(X)
+
+    X_reshaped = np.reshape(X, (data_shape[0], -1))
+    sm = SMOTEENN(random_state=42)
+    X_res, Y_res = sm.fit_resample(X_reshaped, y)
+    X_res = np.reshape(X_res, [-1, *data_shape[1:]])
+    return Data(X_res, Y_res, dataset.test.data, dataset.test.labels)
+
+def smotetomek_dataset(dataset: Data):
+    # unpack
+    X = dataset.train.data
+    y = dataset.train.labels
+
+    data_shape = np.shape(X)
+
+    X_reshaped = np.reshape(X, (data_shape[0], -1))
+    sm = SMOTETomek(random_state=42)
+    X_res, Y_res = sm.fit_resample(X_reshaped, y)
+    X_res = np.reshape(X_res, [-1, *data_shape[1:]])
+    return Data(X_res, Y_res, dataset.test.data, dataset.test.labels)
+
+def adasyn_dataset(dataset: Data):
+    # unpack
+    X = dataset.train.data
+    y = dataset.train.labels
+
+    data_shape = np.shape(X)
+
+    X_reshaped = np.reshape(X, (data_shape[0], -1))
+    sm = ADASYN(random_state=42)
+    X_res, Y_res = sm.fit_resample(X_reshaped, y)
+    X_res = np.reshape(X_res, [-1, *data_shape[1:]])
+    return Data(X_res, Y_res, dataset.test.data, dataset.test.labels)
+
+def clustercentroid_dataset(dataset: Data):
+    # unpack
+    X = dataset.train.data
+    y = dataset.train.labels
+
+    data_shape = np.shape(X)
+
+    X_reshaped = np.reshape(X, (data_shape[0], -1))
+    sm = ClusterCentroids(random_state=42)
+    X_res, Y_res = sm.fit_resample(X_reshaped, y)
+    X_res = np.reshape(X_res, [-1, *data_shape[1:]])
+    return Data(X_res, Y_res, dataset.test.data, dataset.test.labels)
 
 def main():
     model = import_model()
@@ -80,11 +152,21 @@ def main_cv(n_splits: int = 10):
     test_data = dataset.test.data.astype(np.float64)
     std_train_data = (train_data - np.mean(train_data, axis=0)) / np.std(train_data, axis=0)
     std_test_data = (test_data - np.mean(test_data, axis=0)) / np.std(test_data, axis=0)
-    train_data, val_data, train_labels, val_labels = train_test_split(std_train_data, dataset.train.labels, test_size=0.2, random_state=42)
+
+    smote_data = smote_dataset(read_data.Data(std_train_data, dataset.train.labels, std_test_data, dataset.test.labels))
+
+    train_data, val_data, train_labels, val_labels = train_test_split(std_train_data, dataset.train.labels,
+                                                                      test_size=0.2, random_state=42)
+    #train_data, val_data, train_labels, val_labels = train_test_split(smote_data.train.data, smote_data.train.labels,
+    #                                                                  test_size=0.2, random_state=42)
+
     #model = import_model()
-    model = lstm.Model()
-    model.train(train_data, train_labels, hyperparams = {"validation": (val_data, val_labels),"epochs": 20, "batch_size": 32})
+
+    #model = lstm.Model()
+    model = cnn_lstm.Model()
+    model.train(train_data, train_labels, hyperparams = {"validation": (val_data, val_labels),"epochs": 100, "batch_size": 32})
     predict = model.test(std_test_data, dataset.test.labels)
+    #predict = model.test(smote_data.test.data, smote_data.test.labels)
     result.append(predict)
 
     """

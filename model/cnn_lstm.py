@@ -7,8 +7,38 @@ from torch import optim
 from sklearn.metrics import confusion_matrix
 from tqdm import tqdm
 from collections import Counter
+from sklearn.metrics import roc_curve, auc
+import matplotlib.pyplot as plt
+from itertools import cycle
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+class CNN(nn.Module):
+    def __init__(self, seq_num):
+        #self.plot = False
+        super(CNN, self).__init__()
+        self.seq_num = seq_num
+        self.layer1 = nn.Sequential(
+            nn.Conv2d(1, 8, kernel_size=(4,3), stride=(2,1), padding=(1,1)),
+            nn.BatchNorm2d(8),
+            nn.ReLU(),
+            nn.AvgPool2d(2),
+            #nn.Conv2d(8, 8, kernel_size=(2, 2), stride=(2, 2), padding=(0, 0)),
+            #nn.BatchNorm2d(8),
+            #nn.ReLU(),
+            nn.Conv2d(8, 16, kernel_size=(3,3), stride=(2,1), padding=(1,1)),
+            nn.BatchNorm2d(16),
+            nn.ReLU(),
+            nn.Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(0, 0)),
+            nn.BatchNorm2d(16),
+            nn.ReLU()
+        )
+
+    def forward(self, x):
+        x = x.view(-1, 1, 20, 6)
+        out = self.layer1(x)
+        out = out.view(-1, self.seq_num, 16)
+        return out
 
 class RNN(nn.Module):
     def __init__(self, input_size, hidden_size, num_layers, num_classes):
@@ -33,6 +63,17 @@ class RNN(nn.Module):
         # Decode the hidden state of the last time step
         out = self.fc(out[:, -1, :])
         return out
+
+class Net(nn.Module):
+    def __init__(self, seq_num):
+        super(Net, self).__init__()
+        self.convnet = CNN(seq_num)
+        self.rnnnet = RNN(16, 16, 2, 2)
+
+    def forward(self, x):
+        out = self.convnet(x)
+        out2 = self.rnnnet(out)
+        return out2
 
 
 class Model(object):
@@ -68,7 +109,7 @@ class Model(object):
         val_dataloader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size,
                                                     shuffle=True, num_workers=4, pin_memory=True)
 
-        self.model = RNN(6, 6, 2, 2).to(device)
+        self.model = Net(5).to(device)
 
         optimizer = optim.Adam(self.model.parameters(), lr=0.001)
 
@@ -165,8 +206,8 @@ class Model(object):
             y_score = model_output.cpu().data.numpy()
             y = one_hot
 
-            np.savetxt("lstm_smote_score", y_score)
-            np.savetxt("lstm_smote_label", y)
+            np.savetxt("cnn_lstm_score", y_score)
+            np.savetxt("cnn_lstm_label", y)
 
             return conf_mat
 
