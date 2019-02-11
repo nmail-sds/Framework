@@ -7,7 +7,7 @@ usage : import sampling.smote as smote
 
 '''
 
-from ds import Pair, Data
+from data.ds import Pair, Data
 from sklearn.datasets import make_classification
 from imblearn.over_sampling import SMOTE
 

@@ -20,7 +20,7 @@ class Model(object):
     def __init__(self, debug=False):
     
         model = Sequential([
-            Flatten(),
+            #Flatten(),
             Dense(32, activation="relu"),
             Dense(8, activation="relu"),
             Dense(4, activation="relu"),
@@ -55,10 +55,10 @@ class Model(object):
         if "validation" in hyperparams.keys():
             val_data = hyperparams["validation"][0]
             val_labels = self._int_to_binary(hyperparams["validation"][1])
-            self.model.fit(data, binary_labels, epochs=200, batch_size=32, 
+            self.model.fit(data, binary_labels, epochs=20, batch_size=32, 
                     validation_data = (val_data, val_labels))
         else:
-            self.model.fit(data, binary_labels, epochs=200, batch_size=32)
+            self.model.fit(data, binary_labels, epochs=20, batch_size=32)
         return 
 
     def test(self, data, labels):

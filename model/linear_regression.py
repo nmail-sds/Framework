@@ -39,6 +39,8 @@ class Model(object):
 
         return : list of predicted output
         '''
-        labels_pred = np.around(self.reg.predict(data)).astype(int)
+        print(self.reg.predict(data).shape)
+        labels_pred = np.clip(np.around(self.reg.predict(data)).astype(int), 0, 1)
+
         return confusion_matrix(labels, labels_pred, labels=[0, 1])
     

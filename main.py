@@ -77,5 +77,5 @@ def main_cv(n_splits: int = 10):
     return
 
 if __name__ == "__main__":
-    #main()
-    main_cv()
+    main()
+    #main_cv()

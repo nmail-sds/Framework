@@ -11,8 +11,8 @@ import csv
 import importlib
 import numpy as np
 from scipy.io import arff
-from ds import Pair, Data
-from sampling import smote_dataset
+from data.ds import Pair, Data
+from data.sampling import smote_dataset
 # util - absolute directory of current file 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -26,7 +26,7 @@ def _read_csv(filename, basedir="."):
     # handles the data that have null column
     for i, row in enumerate(data):
         for j, item in enumerate(row):
-            data[i][j] = '0.0' if item == '' else item
+            data[i][j] = np.nan if item == '' else item
     return data
 
 def _read_arff(filename, basedir="."):
@@ -40,19 +40,27 @@ def _read_arff(filename, basedir="."):
 
 def _read_secom():
     # unsplitted data
-    # 1568 -> 1199 + 368
+    # 1566 -> 1200 + 366
     working_dir = os.path.join(dir_path, "uci-secom")
     
     uci_secom_data = []
     for filename in os.listdir(working_dir):
         uci_secom_data.extend(_read_csv(filename, working_dir))
-    uci_secom_data = np.asarray(uci_secom_data)
+    uci_secom_data = np.asarray(uci_secom_data)[1:, 1:].astype(float)
     # first line has label name, so it will be removed.
     # secom data has time column(at first), so we will erase it
     
-    train_data = uci_secom_data[1:1200, 1:-1].astype(float)
-    test_data = uci_secom_data[1200:, 1:-1].astype(float)
-    train_labels = (uci_secom_data[1:1200, -1].astype(int) + 1) / 2
+    # normalization
+    
+    from sklearn.preprocessing import normalize
+    for i in range(len(uci_secom_data[0]) - 1):
+        uci_secom_data[:, i] -= np.average(uci_secom_data[:, i], axis = 0)
+        if np.std(uci_secom_data[:, i]) > 0.1:
+            uci_secom_data[:, i] /= np.std(uci_secom_data[:, i], axis = 0)
+
+    train_data = uci_secom_data[:1200, :-1].astype(float)
+    test_data = uci_secom_data[1200:, :-1].astype(float)
+    train_labels = (uci_secom_data[:1200, -1].astype(int) + 1) / 2
     test_labels = (uci_secom_data[1200:, -1].astype(int) + 1) / 2
 
     return Data(train_data, train_labels, test_data, test_labels)
