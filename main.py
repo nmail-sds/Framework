@@ -51,11 +51,6 @@ def import_dataset():
 def main():
     model = import_model()
     dataset = import_dataset()
-    print(model)
-    print(dataset.train.data)
-    print(dataset.train.labels)
-    print(dataset.test.data)
-    print(dataset.test.labels)
     model.train(dataset.train.data, dataset.train.labels)
     predict = model.test(dataset.test.data, dataset.test.labels)
     print("confusion matrix: ")

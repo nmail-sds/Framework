@@ -7,16 +7,18 @@ data/read.py
 '''
 
 import os
+import sys
 import csv
 import importlib
 import numpy as np
 from scipy.io import arff
-import data.pickle_loader as pkl_loader
+import pickle_loader as pkl_loader
 
 from ds import Pair, Data
 from sampling import smote_dataset
 # util - absolute directory of current file 
 dir_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, os.path.join(dir_path, ".."))
 
 
 # Primitive function that read data file
@@ -58,6 +60,23 @@ def _read_secom():
     test_labels = (uci_secom_data[1200:, -1].astype(int) + 1) / 2
 
     return Data(train_data, train_labels, test_data, test_labels)
+
+def _read_secom_preprocessed():
+    working_dir = os.path.join(dir_path, "uci-secom-preprocessed")
+    
+    data = Data(None, None, None, None)
+    for filename in os.listdir(working_dir):
+        if filename == "train.labels.csv":
+            data.train.labels = np.asarray(_read_csv(filename, working_dir)).astype(int).flatten()
+        if filename == "test.labels.csv":
+            data.test.labels = np.asarray(_read_csv(filename, working_dir)).astype(int).flatten()
+        if filename == "train_knnImpute.csv":
+            data.train.data = np.asarray(_read_csv(filename, working_dir)).astype(float)
+        if filename == "test_knnImpute.csv":
+            data.test.data = np.asarray(_read_csv(filename, working_dir)).astype(float)
+
+    return data
+
 
 def _read_wafer():
     # train data 6164 * 152
@@ -196,10 +215,10 @@ def _read_cmu_wafer():
 def _read_cmu_wafer():
     # load faster using pickle 
     data = Data(None, None, None, None)
-    data.train.data = pkl_loader.pkl2np("train_data.pkl")
-    data.train.labels = pkl_loader.pkl2np("train_labels.pkl")
-    data.test.data = pkl_loader.pkl2np("test_data.pkl")
-    data.test.labels = pkl_loader.pkl2np("test_labels.pkl")
+    data.train.data = pkl_loader.pkl2np("train_data.pkl").astype(int)
+    data.train.labels = pkl_loader.pkl2np("train_labels.pkl").astype(int)
+    data.test.data = pkl_loader.pkl2np("test_data.pkl").astype(int)
+    data.test.labels = pkl_loader.pkl2np("test_labels.pkl").astype(int)
     return data 
 
     
@@ -221,6 +240,10 @@ def main(dataset_name: str, smote: bool = False):
     if dataset_name == "etc":
         # add something in here
         return None
+    
+    if dataset_name == "uci-secom-preprocessed":
+        dataset = _read_secom_preprocessed()
+    
     
     # data manipulation
     if smote:
