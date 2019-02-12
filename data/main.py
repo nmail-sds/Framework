@@ -196,10 +196,10 @@ def _read_cmu_wafer():
 def _read_cmu_wafer():
     # load faster using pickle 
     data = Data(None, None, None, None)
-    pkl_loader.np2pkl("train_data.pkl", data.train.data)
-    pkl_loader.np2pkl("train_labels.pkl", data.train.labels)
-    pkl_loader.np2pkl("test_data.pkl", data.test.data)
-    pkl_loader.np2pkl("test_labels.pkl", data.test.labels)
+    data.train.data = pkl_loader.pkl2np("train_data.pkl")
+    data.train.labels = pkl_loader.pkl2np("train_labels.pkl")
+    data.test.data = pkl_loader.pkl2np("test_data.pkl")
+    data.test.labels = pkl_loader.pkl2np("test_labels.pkl")
     return data 
 
     

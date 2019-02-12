@@ -28,6 +28,8 @@ class Model(object):
         if self.debug:
             print(data.shape)
             print(labels.shape)
+        if len(data.shape) > 2:
+            data = data.reshape([data.shape[0], -1])
         self.reg = self.model.fit(data, labels)
         if self.debug:
             print(self.reg.score(data, labels))
@@ -39,6 +41,8 @@ class Model(object):
 
         return : list of predicted output
         '''
+        if len(data.shape) > 2:
+            data = data.reshape([data.shape[0], -1])
         labels_pred = np.around(self.reg.predict(data)).astype(int)
         return confusion_matrix(labels, labels_pred, labels=[0, 1])
     
