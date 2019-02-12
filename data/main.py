@@ -61,20 +61,42 @@ def _read_secom():
 
     return Data(train_data, train_labels, test_data, test_labels)
 
-def _read_secom_preprocessed():
+def _read_secom_preprocessed(process_type: str = None):
     working_dir = os.path.join(dir_path, "uci-secom-preprocessed")
     
     data = Data(None, None, None, None)
+    
     for filename in os.listdir(working_dir):
+        # common : labels
         if filename == "train.labels.csv":
             data.train.labels = np.asarray(_read_csv(filename, working_dir)).astype(int).flatten()
         if filename == "test.labels.csv":
             data.test.labels = np.asarray(_read_csv(filename, working_dir)).astype(int).flatten()
-        if filename == "train_knnImpute.csv":
-            data.train.data = np.asarray(_read_csv(filename, working_dir)).astype(float)
-        if filename == "test_knnImpute.csv":
-            data.test.data = np.asarray(_read_csv(filename, working_dir)).astype(float)
 
+        if process_type == None:
+            if filename == "train_knnImpute.csv":
+                data.train.data = np.asarray(_read_csv(filename, working_dir)).astype(float)
+            if filename == "test_knnImpute.csv":
+                data.test.data = np.asarray(_read_csv(filename, working_dir)).astype(float)
+
+        if process_type == "pca":
+            if filename == "train_pca.csv":
+                data.train.data = np.asarray(_read_csv(filename, working_dir)).astype(float)
+            if filename == "test_pca.csv":
+                data.test.data = np.asarray(_read_csv(filename, working_dir)).astype(float)
+
+        if process_type == "ica":
+            if filename == "train_ica.csv":
+                data.train.data = np.asarray(_read_csv(filename, working_dir)).astype(float)
+            if filename == "test_ica.csv":
+                data.test.data = np.asarray(_read_csv(filename, working_dir)).astype(float)
+
+        if process_type == "chisq":
+            if filename == "train_chisq.csv":
+                data.train.data = np.asarray(_read_csv(filename, working_dir)).astype(float)
+            if filename == "test_chisq.csv":
+                data.test.data = np.asarray(_read_csv(filename, working_dir)).astype(float)
+ 
     return data
 
 
@@ -240,9 +262,18 @@ def main(dataset_name: str, smote: bool = False):
     if dataset_name == "etc":
         # add something in here
         return None
-    
-    if dataset_name == "uci-secom-preprocessed":
+       
+    if dataset_name == "uci-secom-prep":
         dataset = _read_secom_preprocessed()
+    
+    if dataset_name == "uci-secom-pca":
+        dataset = _read_secom_preprocessed("pca")
+    
+    if dataset_name == "uci-secom-ica":
+        dataset = _read_secom_preprocessed("ica")
+    
+    if dataset_name == "uci-secom-chisq":
+        dataset = _read_secom_preprocessed("chisq")
     
     
     # data manipulation

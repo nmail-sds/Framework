@@ -29,7 +29,6 @@ parser.add_argument("--smote", action="store_true", default=False, help="resampl
 
 args = parser.parse_args()
 # args.model, args.dataset을 통해 입력값을 사용할 수 있음
-print(args.smote)
 
 # args.model을 불러오기
 
